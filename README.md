@@ -9,8 +9,6 @@ It is designed to read B2MC simulation output (ROOT files), process the detector
 - Simple modular structure for extending analysis logic  
 - Example executables for running on B2MC ROOT files  
 
----
-
 ## Requirements
 - C++17 or later  
 - [ROOT](https://root.cern/) (>= 6.18 recommended)  
@@ -18,8 +16,6 @@ It is designed to read B2MC simulation output (ROOT files), process the detector
 - Boost (program_options)  
 
 Make sure that ROOT and Geant4 are properly sourced before building.
-
----
 
 ## Build Instructions
 
