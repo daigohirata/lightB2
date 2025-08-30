@@ -15,6 +15,9 @@
 #include <B2Enum.hh>
 #include <B2Pdg.hh>
 
+std::unique_ptr<TFile> L2TrackAnalyzer::spline_file_ = nullptr;
+std::vector<TSpline3*> L2TrackAnalyzer::mucl_spline_;
+
 L2TrackAnalyzer::L2TrackAnalyzer(const B2SpillSummary* spill,
                                  const B2TrackSummary* track,
                                  B2Detector vertex_detector,

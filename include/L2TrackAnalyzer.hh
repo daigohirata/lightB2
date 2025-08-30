@@ -9,6 +9,7 @@
 #include <B2SpillSummary.hh>
 #include <B2TrackSummary.hh>
 #include <B2Enum.hh>
+#include <TSpline.h>
 
 class L2TrackAnalyzer {
 public:
