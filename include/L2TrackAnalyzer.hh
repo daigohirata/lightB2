@@ -11,32 +11,33 @@
 #include <B2Enum.hh>
 
 class L2TrackAnalyzer {
-  public:
-    L2TrackAnalyzer(const B2SpillSummary* spill,
-                    const B2TrackSummary* track,
-                    const B2Detector& vertex_detector,
-                    const TString& spline_file_path);
+public:
+  L2TrackAnalyzer(const B2SpillSummary* spill,
+                  const B2TrackSummary* track,
+                  B2Detector vertex_detector,
+                  const std::string& spline_file_path);
 
-    const B2TrackSummary* SearchChildMuon(const B2SpillSummary* spill) const;
-    Bool_t HasVertexDetectorHit() const;
-    B2Detector HitMuonDetector(const Int_t& bm_top_required) const;
+  const B2TrackSummary* SearchChildMuon(const B2SpillSummary* spill) const;
+  Bool_t HasVertexDetectorHit() const;
+  B2Detector HitMuonDetector(const Int_t& bm_top_required) const;
 
-    /**
-     * @return scintillator number defined as following
-     *  0:PM Ingrid,  1:PM Scibar,
-     *  2:UWG grid,   3:UWG plane,
-     *  4:DWG grid,   5:DWG plane
-     */
-    Int_t ClassifyScintillator(const B2HitSummary* single_hit) const;
-    Double_t CalculateDedx(const B2HitSummary* single_hit) const;
-    Double_t CalculateMucl() const;
+  /**
+   * @return scintillator number defined as following
+   *  0:PM Ingrid,  1:PM Scibar,
+   *  2:UWG grid,   3:UWG plane,
+   *  4:DWG grid,   5:DWG plane
+   */
+  Int_t ClassifyScintillator(const B2HitSummary* single_hit) const;
+  Double_t CalculateDedx(const B2HitSummary* single_hit) const;
+  Double_t CalculateMucl() const;
 
 
-  private:
-    const B2SpillSummary* spill_;
-    const B2TrackSummary* track_;
-    const B2Detector& vertex_detector_;
-    const TString& spline_file_path_;
+private:
+  const B2SpillSummary* spill_;
+  const B2TrackSummary* track_;
+  const B2Detector& vertex_detector_;
+  static std::unique_ptr<TFile> spline_file_;
+  static std::vector<TSpline3*> mucl_spline_;
 };
 
 #endif // LIGHTB2_L2TRACKANALYZER

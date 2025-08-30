@@ -17,9 +17,24 @@
 
 L2TrackAnalyzer::L2TrackAnalyzer(const B2SpillSummary* spill,
                                  const B2TrackSummary* track,
-                                 const B2Detector& vertex_detector,
-                                 const TString& spline_file_path): 
-  spill_(spill), track_(track), vertex_detector_(vertex_detector), spline_file_path_(spline_file_path) {};
+                                 B2Detector vertex_detector,
+                                 const std::string& spline_file_path)
+  : spill_(spill), track_(track), vertex_detector_(vertex_detector) {
+  if (!spline_file_) {
+    spline_file_.reset(TFile::Open(spline_file_path.c_str(), "READ"));
+
+    if (!spline_file_ || spline_file_->IsZombie()) {
+      throw std::runtime_error("Failed to open spline file: " + spline_file_path);
+    }
+
+    mucl_spline_.emplace_back((TSpline3*)spline_file_->Get("spline_1_0_0_0")); // PM Ingrid
+    mucl_spline_.emplace_back((TSpline3*)spline_file_->Get("spline_1_0_1_0")); // PM Scibar
+    mucl_spline_.emplace_back((TSpline3*)spline_file_->Get("spline_1_1_0_0")); // UWG grid
+    mucl_spline_.emplace_back((TSpline3*)spline_file_->Get("spline_1_1_1_0")); // UWG plane
+    mucl_spline_.emplace_back((TSpline3*)spline_file_->Get("spline_1_2_0_0")); // DWG grid
+    mucl_spline_.emplace_back((TSpline3*)spline_file_->Get("spline_1_2_1_0")); // DWG plane
+  }
+}
 
 const B2TrackSummary* L2TrackAnalyzer::SearchChildMuon(const B2SpillSummary* spill) const {
   for (auto it_track = spill->BeginTrueTrack(); const auto* track = it_track.Next(); ) {
@@ -127,15 +142,6 @@ Double_t L2TrackAnalyzer::CalculateDedx(const B2HitSummary* single_hit) const {
 }
 
 Double_t L2TrackAnalyzer::CalculateMucl() const {
-  TFile* spline_mucl = TFile::Open("/home/nu/dhirata/wg_app/LightB2/data/spline/mucl_spline_angle_correction_dE_extention_pm_wg_tuned.root");
-  std::vector<TSpline3*> mucl_spline = {};
-  mucl_spline.emplace_back( (TSpline3*)spline_mucl->Get("spline_1_0_0_0") ); //PM Ingrid
-  mucl_spline.emplace_back( (TSpline3*)spline_mucl->Get("spline_1_0_1_0") ); //PM Scibar
-  mucl_spline.emplace_back( (TSpline3*)spline_mucl->Get("spline_1_1_0_0") ); //UWG grid
-  mucl_spline.emplace_back( (TSpline3*)spline_mucl->Get("spline_1_1_1_0") ); //UWG plane
-  mucl_spline.emplace_back( (TSpline3*)spline_mucl->Get("spline_1_2_0_0") ); //DWG grid
-  mucl_spline.emplace_back( (TSpline3*)spline_mucl->Get("spline_1_2_1_0") ); //DWG plane
-
   Double_t mucl_products = 1.0;
   Int_t num_calc_hits = 0;
 
@@ -143,7 +149,7 @@ Double_t L2TrackAnalyzer::CalculateMucl() const {
     if (single_hit->GetDetectorId() != vertex_detector_) continue;
     if (ClassifyScintillator(single_hit) == -1) continue;
 
-    Double_t confidence_level = mucl_spline.at( ClassifyScintillator(single_hit) )->Eval( CalculateDedx(single_hit) );
+    Double_t confidence_level = mucl_spline_.at( ClassifyScintillator(single_hit) )->Eval( CalculateDedx(single_hit) );
     if (confidence_level < 0) continue;
     mucl_products *= confidence_level;
     num_calc_hits++;
@@ -155,7 +161,7 @@ Double_t L2TrackAnalyzer::CalculateMucl() const {
       if (single_hit->GetDetectorId() != vertex_detector_) continue;
       if (ClassifyScintillator(single_hit) == -1) continue;
 
-      Double_t confidence_level = mucl_spline.at( ClassifyScintillator(single_hit) )->Eval( CalculateDedx(single_hit) );
+      Double_t confidence_level = mucl_spline_.at( ClassifyScintillator(single_hit) )->Eval( CalculateDedx(single_hit) );
 
       if (confidence_level < 0) continue;
       mucl_products *= confidence_level;
