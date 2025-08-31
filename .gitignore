@@ -1,5 +1,6 @@
 .vscode/
 build/
+log/
 
 build.bash
 submit.bash

@@ -36,7 +36,7 @@ public:
 private:
   const B2SpillSummary* spill_;
   const B2TrackSummary* track_;
-  const B2Detector& vertex_detector_;
+  B2Detector vertex_detector_;
   static std::unique_ptr<TFile> spline_file_;
   static std::vector<TSpline3*> mucl_spline_;
 };
