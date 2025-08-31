@@ -40,8 +40,6 @@ L2Writer::L2Writer(const TString& filename) {
 
 L2Writer::~L2Writer() {
   std::cout << "[L2Writer] Destructor called." << std::endl;
-  // delete tree_;   ←消す
-  std::cout << "[L2Writer] Destructor finished." << std::endl;
 }
 
 void L2Writer::Clear() {
