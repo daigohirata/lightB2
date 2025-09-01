@@ -115,7 +115,7 @@ Int_t L2TrackAnalyzer::ClassifyScintillator(const B2HitSummary* single_hit) cons
 Double_t L2TrackAnalyzer::CalculateDedx(const B2HitSummary* single_hit) const {
   Double_t scintillator_thickness; //[cm]
   const Int_t scintillator_class = ClassifyScintillator(single_hit);
-  Double_t angle = track_->GetAngle().GetValue() * TMath::Pi() / 180.0;
+  TVector3 dir = track_->GetInitialDirection().GetValue();
   Double_t energy_deposit = single_hit->GetEnergyDeposit();
   Double_t path_length;
   Double_t max_path_length = 100.0; //[cm]
@@ -123,19 +123,19 @@ Double_t L2TrackAnalyzer::CalculateDedx(const B2HitSummary* single_hit) const {
   if (scintillator_class == 0) {
     scintillator_thickness = PM_INGRID_SCINTI_THICK / cm;
     if ( 18 <= single_hit->GetPlane() && single_hit->GetPlane() <= 21 ) {
-      path_length = scintillator_thickness / std::sin(angle);
+      path_length = scintillator_thickness / std::abs(dir.X());
     } else {
-      path_length = scintillator_thickness / std::abs(std::cos(angle));
+      path_length = scintillator_thickness / std::abs(dir.Z());
     }
   } else if ( scintillator_class == 1 ) {
     scintillator_thickness = PM_SCIBAR_SCINTI_THICK / cm;
-    path_length = scintillator_thickness / std::abs(std::cos(angle));
+    path_length = scintillator_thickness / std::abs(dir.Z());
   } else if ( scintillator_class == 2 || scintillator_class == 4 ) {
     scintillator_thickness = WGS_SCINTI_THICK / cm;
-    path_length = scintillator_thickness / std::sin(angle);
+    path_length = scintillator_thickness / std::abs(dir.X());
   } else if ( scintillator_class == 3 || scintillator_class == 5 ) {
     scintillator_thickness = WGS_SCINTI_THICK / cm;
-    path_length = scintillator_thickness / std::abs(std::cos(angle));
+    path_length = scintillator_thickness / std::abs(dir.Z());
   } else {
     return 999.0;
   }
