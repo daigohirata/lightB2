@@ -86,7 +86,7 @@ B2Detector L2TrackAnalyzer::HitMuonDetector(const Int_t& bm_top_required) const 
 Int_t L2TrackAnalyzer::ClassifyScintillator(const B2HitSummary* single_hit) const {
   if (single_hit->GetDetectorId() == B2Detector::kProtonModule) {
     if ( (single_hit->GetPlane() == 0) ||
-          (18 <= single_hit->GetPlane() && single_hit->GetPlane() <= 21) ) {
+         (18 <= single_hit->GetPlane() && single_hit->GetPlane() <= 21) ) {
       return 0;
     } else if (1 <= single_hit->GetPlane() && single_hit->GetPlane() <= 17) {
       if (8 <= single_hit->GetSlot().GetValue(single_hit->GetSingleReadout()) && single_hit->GetSlot().GetValue(single_hit->GetSingleReadout()) <= 23) {
@@ -144,36 +144,92 @@ Double_t L2TrackAnalyzer::CalculateDedx(const B2HitSummary* single_hit) const {
   return (energy_deposit / path_length);
 }
 
-Double_t L2TrackAnalyzer::CalculateMucl() const {
+std::vector<const B2HitSummary*> L2TrackAnalyzer::SelectHitsExcludingFarthest(const B2TrackSummary* track, int num_exclude_hits) const {
+  std::vector<std::pair<Double_t, const B2HitSummary*>> hits_with_dist;
+  const TVector3& initial_pos = track->GetInitialPosition().GetValue();
+
+  for (auto it_hit = track->BeginHit(); auto hit = it_hit.Next(); ) {
+    if (hit->GetDetectorId() != vertex_detector_) continue;
+    if (ClassifyScintillator(hit) == -1) continue;
+
+    Double_t dist = (hit->GetTrueAbsolutePosition().GetValue() - initial_pos).Mag();
+    hits_with_dist.emplace_back(dist, hit);
+  }
+
+  // 距離大きい順にソート
+  std::sort(hits_with_dist.begin(), hits_with_dist.end(), [](auto& a, auto& b) { return a.first > b.first; });
+
+  // exclude_n個除外
+  if ((int)hits_with_dist.size() > num_exclude_hits) {
+    hits_with_dist.erase(hits_with_dist.begin(), hits_with_dist.begin() + num_exclude_hits);
+  }
+
+  // Hitだけ取り出す
+  std::vector<const B2HitSummary*> selected_hits;
+  for (auto& [dist, hit] : hits_with_dist) {
+    selected_hits.push_back(hit);
+  }
+  return selected_hits;
+}
+
+std::pair<Double_t, Int_t> L2TrackAnalyzer::CalculateMuclFromHits(const std::vector<const B2HitSummary*>& hits) const {
   Double_t mucl_products = 1.0;
   Int_t num_calc_hits = 0;
 
-  for (auto it_hit = track_->BeginHit(); auto single_hit = it_hit.Next(); ) {
-    if (single_hit->GetDetectorId() != vertex_detector_) continue;
-    if (ClassifyScintillator(single_hit) == -1) continue;
+  for (auto hit : hits) {
+    Double_t confidence_level = mucl_spline_.at(ClassifyScintillator(hit))->Eval(CalculateDedx(hit));
 
-    Double_t confidence_level = mucl_spline_.at( ClassifyScintillator(single_hit) )->Eval( CalculateDedx(single_hit) );
     if (confidence_level < 0) continue;
     mucl_products *= confidence_level;
     num_calc_hits++;
   }
+  return {mucl_products, num_calc_hits};
+}
 
-  if ( B2Pdg::IsChargedPion(track_->GetParticlePdg()) ) {
-    auto track = SearchChildMuon(spill_);
-    for (auto it_hit = track_->BeginHit(); auto single_hit = it_hit.Next(); ) {
-      if (single_hit->GetDetectorId() != vertex_detector_) continue;
-      if (ClassifyScintillator(single_hit) == -1) continue;
+Double_t L2TrackAnalyzer::CalculateMucl(const int& num_exclude_hits) const {
+  Double_t mucl_products = 1.0;
+  Int_t num_calc_hits = 0;
 
-      Double_t confidence_level = mucl_spline_.at( ClassifyScintillator(single_hit) )->Eval( CalculateDedx(single_hit) );
+  // --- case: track が荷電パイオン ---
+  if (B2Pdg::IsChargedPion(track_->GetParticlePdg())) {
+    auto muon_track = SearchChildMuon(spill_);
+    if (muon_track) {
+      // 子ミューオンあり → 子ミューオンに除外ルール
+      auto hits_mu = SelectHitsExcludingFarthest(muon_track, num_exclude_hits);
+      auto [prod_mu, n_mu] = CalculateMuclFromHits(hits_mu);
+      mucl_products *= prod_mu;
+      num_calc_hits += n_mu;
 
-      if (confidence_level < 0) continue;
-      mucl_products *= confidence_level;
-      num_calc_hits++;
+      // 親パイオンは全ヒット
+      std::vector<const B2HitSummary*> hits_pi;
+      for (auto it_hit = track_->BeginHit(); auto hit = it_hit.Next(); ) {
+        if (hit->GetDetectorId() != vertex_detector_) continue;
+        if (ClassifyScintillator(hit) == -1) continue;
+        hits_pi.push_back(hit);
+      }
+      auto [prod_pi, n_pi] = CalculateMuclFromHits(hits_pi);
+      mucl_products *= prod_pi;
+      num_calc_hits += n_pi;
+    } else {
+      // 子ミューオンなし → 親パイオンに除外ルール
+      auto hits_pi = SelectHitsExcludingFarthest(track_, num_exclude_hits);
+      auto [prod_pi, n_pi] = CalculateMuclFromHits(hits_pi);
+      mucl_products *= prod_pi;
+      num_calc_hits += n_pi;
     }
   }
 
+  // --- case: track がそれ以外（muon, proton, etc.）---
+  else {
+    auto hits = SelectHitsExcludingFarthest(track_, num_exclude_hits);
+    auto [prod, n] = CalculateMuclFromHits(hits);
+    mucl_products *= prod;
+    num_calc_hits += n;
+  }
+
+  // --- 補正 ---
   Double_t adjustment_factor = 0;
-  for (Int_t i=0; i < num_calc_hits; ++i) {
+  for (Int_t i = 0; i < num_calc_hits; ++i) {
     adjustment_factor += std::pow(-std::log(mucl_products), i) / TMath::Factorial(i);
   }
 

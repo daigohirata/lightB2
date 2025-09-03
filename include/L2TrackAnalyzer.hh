@@ -30,7 +30,9 @@ public:
    */
   Int_t ClassifyScintillator(const B2HitSummary* single_hit) const;
   Double_t CalculateDedx(const B2HitSummary* single_hit) const;
-  Double_t CalculateMucl() const;
+  std::vector<const B2HitSummary*> SelectHitsExcludingFarthest(const B2TrackSummary* track, int num_exclude_hits) const;
+  std::pair<Double_t, Int_t> CalculateMuclFromHits(const std::vector<const B2HitSummary*>& hits) const;
+  Double_t CalculateMucl(const int& mucl_ignore_hit) const;
 
 
 private:

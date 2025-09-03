@@ -8,6 +8,6 @@
 #include "L2Writer.hh"
 
 Int_t process(const int& file_number, L2Writer& writer, const std::string& gemetry_dir,
-              const std::string& spline_file_path, const int& bm_required_hit);
+              const std::string& spline_file_path, const int& bm_required_hit, const int& mucl_ignore_hits);
 
 #endif // LIGHTB2_L2PROCESS_HH

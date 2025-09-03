@@ -26,7 +26,7 @@
 
 // process each files
 Int_t process(const int& file_number, L2Writer& writer, const std::string& geometry_dir,
-              const std::string& spline_file_path, const int& bm_required_hit) {
+              const std::string& spline_file_path, const int& bm_required_hit, const int& num_exclude_hits) {
   // TString file_name = "/group/nu/ninja/work/han/mc/e71a/3_b2mc/out/mc." + TString::Format("%03d", file_number) + ".root";
   TString file_name = "/hsm/nu/wagasci/dhirata/mc/250kA/2_B2MC/out/b2mc." + TString::Format("%03d", file_number) + ".root";
 
@@ -49,7 +49,7 @@ Int_t process(const int& file_number, L2Writer& writer, const std::string& geome
 
   // event loop
   Int_t nEntries = tree_wgbm->GetEntries();
-  for (Int_t iEntry=0; iEntry<nEntries; ++iEntry){
+  for (Int_t iEntry=0; iEntry<nEntries; ++iEntry){ 
     writer.Clear();
     tree_wgbm->GetEntry(iEntry);
     
@@ -86,8 +86,19 @@ Int_t process(const int& file_number, L2Writer& writer, const std::string& geome
       writer.momentum_.emplace_back( track->GetInitialAbsoluteMomentum().GetValue() );
       writer.cos_theta_.emplace_back( cos_theta );
       writer.hit_muon_detector_.emplace_back( analyzer.HitMuonDetector(bm_required_hit) );
-      writer.mucl_.emplace_back( analyzer.CalculateMucl() );
-      writer.is_contained_.emplace_back( L2FV::IsContained(vertex_detector, final_pos) );
+      if ( B2Pdg::IsChargedPion(track->GetParticlePdg()) &&
+           analyzer.SearchChildMuon(spill) ) {
+        writer.is_contained_.emplace_back( L2FV::IsContained(vertex_detector, analyzer.SearchChildMuon(spill)->GetFinalPosition().GetValue()) );
+      } else {
+        writer.is_contained_.emplace_back( L2FV::IsContained(vertex_detector, final_pos) );
+      }
+
+      if ( B2Pdg::IsChargedPion(track->GetParticlePdg()) &&
+           writer.is_contained_.at( writer.is_contained_.size() - 1 ) ) {
+        writer.mucl_.emplace_back( analyzer.CalculateMucl(num_exclude_hits) );
+      } else {
+        writer.mucl_.emplace_back( analyzer.CalculateMucl(0) );
+      }
     }
 
     writer.Fill();
