@@ -29,6 +29,7 @@ add_library(l2core
   src/L2TrackAnalyzer.cc
   src/L2Util.cc
   src/L2Writer.cc
+  src/L2MichelElectron.cc
 )
 
 # link
