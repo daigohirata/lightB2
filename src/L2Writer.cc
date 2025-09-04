@@ -27,6 +27,7 @@ L2Writer::L2Writer(const TString& filename) {
   tree_->Branch("vertex_detector",   &vertex_detector_);
   tree_->Branch("num_fs_pion",       &num_fs_pion_);
   tree_->Branch("num_hit_track",     &num_hit_track_);
+  tree_->Branch("has_vertex_me",     &has_vertex_me_);
   tree_->Branch("pdg",               &particle_pdg_);
   tree_->Branch("length",            &length_);
   tree_->Branch("momentum",          &momentum_);
@@ -34,6 +35,7 @@ L2Writer::L2Writer(const TString& filename) {
   tree_->Branch("hit_muon_detector", &hit_muon_detector_);
   tree_->Branch("mucl",              &mucl_);
   tree_->Branch("is_contained",      &is_contained_);
+  tree_->Branch("has_track_me",      &has_track_me_);
 
   Clear();
 }
@@ -50,6 +52,7 @@ void L2Writer::Clear() {
   vertex_detector_ = -2;
   num_fs_pion_ = 0;
   num_hit_track_ = 0;
+  has_vertex_me_ = false;
   particle_pdg_.clear();
   length_.clear();
   momentum_.clear();
@@ -57,6 +60,7 @@ void L2Writer::Clear() {
   hit_muon_detector_.clear();
   mucl_.clear();
   is_contained_.clear();
+  has_track_me_.clear();
 }
 
 void L2Writer::Fill() {

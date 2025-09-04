@@ -23,6 +23,7 @@
 #include "L2TrackAnalyzer.hh"
 #include "L2FV.hh"
 #include "L2Util.hh"
+#include "L2MichelElectron.hh"
 
 // process each files
 Int_t process(const int& file_number, L2Writer& writer, const std::string& geometry_dir,
@@ -43,7 +44,7 @@ Int_t process(const int& file_number, L2Writer& writer, const std::string& geome
       return 999;
   }
 
-  L2Util::set_branch_status(tree_wgbm);
+  // L2Util::set_branch_status(tree_wgbm);
   B2SpillSummary* spill = nullptr;
   tree_wgbm->SetBranchAddress("spill", &spill);
 
@@ -59,11 +60,14 @@ Int_t process(const int& file_number, L2Writer& writer, const std::string& geome
     B2Detector vertex_detector = L2FV::CheckInsideFV(abs_pos);
     if (vertex_detector == B2Detector::kUnknownDetector) continue;
 
+    L2MichelElectron me_seacher(spill, vertex_detector);
+
     writer.file_id_ = file_number;
     writer.event_id_ = iEntry;
     writer.incoming_neutrino_ = vertex->GetIncomingParticlePdg();
     writer.mode_ = vertex->GetInteractionType();
     writer.vertex_detector_ = (Int_t)vertex_detector;
+    writer.has_vertex_me_ = me_seacher.SearchAroundVertex();
 
     // track loop
     for (auto it_track = spill->BeginTrueTrack(); const auto* track = it_track.Next(); ) {
@@ -96,8 +100,10 @@ Int_t process(const int& file_number, L2Writer& writer, const std::string& geome
 
       if ( writer.is_contained_.back() ) {
         writer.mucl_.emplace_back( analyzer.CalculateMucl(num_exclude_hits) );
+        writer.has_track_me_.emplace_back( me_seacher.SearchAroundTrackEnd(track) );
       } else {
         writer.mucl_.emplace_back( analyzer.CalculateMucl(0) );
+        writer.has_track_me_.emplace_back( false );
       }
     }
 

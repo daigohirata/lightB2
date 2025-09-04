@@ -7,6 +7,7 @@
 // ROOT include
 #include <TFile.h>
 #include <TSpline.h>
+#include <TVector3.h>
 
 // B2MC include
 #include <B2SpillSummary.hh>
