@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
   int bm_required_hit = 3;
   int num_exclude_hits = 3;
   std::string geometry_dir = "/home/nu/dhirata/wg_app/WagasciMC/etc/wagasci/b2/geometry";
-  std::string spline_file_path = "/home/nu/dhirata/wg_app/LightB2/data/spline/mucl_spline_angle_correction_dE_extention_pm_wg_tuned.root";
+  std::string spline_file_path = "/home/nu/dhirata/wg_app/LightB2/data/spline/mucl_spline_angle_correction_dE_extention_pm_wg_tuned_20k_10k.root";
   std::string output_dir = "/hsm/nu/wagasci/dhirata/mc/PID/2_de_dx/";
 
   po::options_description desc("Allowed options");

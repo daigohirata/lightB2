@@ -86,15 +86,15 @@ Int_t process(const int& file_number, L2Writer& writer, const std::string& geome
       writer.momentum_.emplace_back( track->GetInitialAbsoluteMomentum().GetValue() );
       writer.cos_theta_.emplace_back( cos_theta );
       writer.hit_muon_detector_.emplace_back( analyzer.HitMuonDetector(bm_required_hit) );
-      if ( B2Pdg::IsChargedPion(track->GetParticlePdg()) &&
-           analyzer.SearchChildMuon(spill) ) {
+      
+      auto child_muon = analyzer.SearchChildMuon(spill);
+      if ( B2Pdg::IsChargedPion(track->GetParticlePdg()) && child_muon) {
         writer.is_contained_.emplace_back( L2FV::IsContained(vertex_detector, analyzer.SearchChildMuon(spill)->GetFinalPosition().GetValue()) );
       } else {
         writer.is_contained_.emplace_back( L2FV::IsContained(vertex_detector, final_pos) );
       }
 
-      if ( B2Pdg::IsChargedPion(track->GetParticlePdg()) &&
-           writer.is_contained_.at( writer.is_contained_.size() - 1 ) ) {
+      if ( writer.is_contained_.back() ) {
         writer.mucl_.emplace_back( analyzer.CalculateMucl(num_exclude_hits) );
       } else {
         writer.mucl_.emplace_back( analyzer.CalculateMucl(0) );
