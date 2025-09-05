@@ -41,6 +41,7 @@ private:
   B2Detector vertex_detector_;
   static std::unique_ptr<TFile> spline_file_;
   static std::vector<TSpline3*> mucl_spline_;
+  const int mucl_least_hits = 3;
 };
 
 #endif // LIGHTB2_L2TRACKANALYZER

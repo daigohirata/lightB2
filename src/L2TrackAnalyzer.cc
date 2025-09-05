@@ -163,8 +163,11 @@ std::vector<const B2HitSummary*> L2TrackAnalyzer::SelectHitsExcludingFarthest(co
   std::sort(hits_with_dist.begin(), hits_with_dist.end(), [](auto& a, auto& b) { return a.first > b.first; });
 
   // exclude_n個除外
-  if ((int)hits_with_dist.size() > num_exclude_hits) {
+  int hits_array_size = (int)hits_with_dist.size();
+  if ( (num_exclude_hits + mucl_least_hits) <= hits_array_size) {
     hits_with_dist.erase(hits_with_dist.begin(), hits_with_dist.begin() + num_exclude_hits);
+  } else if ( mucl_least_hits < hits_array_size ) {
+    hits_with_dist.erase(hits_with_dist.begin(), hits_with_dist.begin() + mucl_least_hits);
   }
 
   // Hitだけ取り出す
