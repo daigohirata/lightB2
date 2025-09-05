@@ -37,6 +37,8 @@ L2TrackAnalyzer::L2TrackAnalyzer(const B2SpillSummary* spill,
     mucl_spline_.emplace_back((TSpline3*)spline_file_->Get("spline_1_1_1_0")); // UWG plane
     mucl_spline_.emplace_back((TSpline3*)spline_file_->Get("spline_1_2_0_0")); // DWG grid
     mucl_spline_.emplace_back((TSpline3*)spline_file_->Get("spline_1_2_1_0")); // DWG plane
+    mucl_spline_.emplace_back((TSpline3*)spline_file_->Get("spline_1_1_0_1")); // UWG grid high angle
+    mucl_spline_.emplace_back((TSpline3*)spline_file_->Get("spline_1_2_0_1")); // DWG grid high angle
   }
 }
 
@@ -178,7 +180,15 @@ std::pair<Double_t, Int_t> L2TrackAnalyzer::CalculateMuclFromHits(const std::vec
   Int_t num_calc_hits = 0;
 
   for (auto hit : hits) {
-    Double_t confidence_level = mucl_spline_.at(ClassifyScintillator(hit))->Eval(CalculateDedx(hit));
+    Int_t scintillator_class = ClassifyScintillator(hit);
+    Double_t confidence_level = 0;
+    if ( (track_->GetAngle().GetValue() > 75) && (scintillator_class==2) ) {
+      confidence_level = mucl_spline_.at(6)->Eval(CalculateDedx(hit));
+    } else if ( (track_->GetAngle().GetValue() > 75) && (scintillator_class==4) ) {
+      confidence_level = mucl_spline_.at(7)->Eval(CalculateDedx(hit));
+    } else {
+      confidence_level = mucl_spline_.at(scintillator_class)->Eval(CalculateDedx(hit));
+    }
 
     if (confidence_level < 0) continue;
     mucl_products *= confidence_level;
