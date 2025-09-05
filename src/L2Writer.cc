@@ -20,23 +20,23 @@ L2Writer::L2Writer(const TString& filename) {
   outfile_ = std::make_unique<TFile>(filename, "RECREATE");
   tree_ = new TTree("l2tree", "Light TTree fomat for WGBM analysis");
 
-  tree_->Branch("file_id",           &file_id_);
-  tree_->Branch("event_id",          &event_id_);
-  tree_->Branch("incoming_neutrino", &incoming_neutrino_);
-  tree_->Branch("mode",              &mode_);
-  tree_->Branch("vertex_detector",   &vertex_detector_);
-  tree_->Branch("num_fs_pion",       &num_fs_pion_);
-  tree_->Branch("num_hit_track",     &num_hit_track_);
-  tree_->Branch("has_vertex_me",     &num_delayed_hits_vertex_);
-  tree_->Branch("pdg",               &particle_pdg_);
-  tree_->Branch("length",            &length_);
-  tree_->Branch("momentum",          &momentum_);
-  tree_->Branch("cos_theta",         &cos_theta_);
-  tree_->Branch("hit_muon_detector", &hit_muon_detector_);
-  tree_->Branch("mucl",              &mucl_);
-  tree_->Branch("is_contained",      &is_contained_);
-  tree_->Branch("has_track_me",      &num_delayed_hits_track_);
-  tree_->Branch("num_hits",          &num_hits_);
+  tree_->Branch("file_id",                 &file_id_);
+  tree_->Branch("event_id",                &event_id_);
+  tree_->Branch("incoming_neutrino",       &incoming_neutrino_);
+  tree_->Branch("mode",                    &mode_);
+  tree_->Branch("vertex_detector",         &vertex_detector_);
+  tree_->Branch("num_fs_pion",             &num_fs_pion_);
+  tree_->Branch("num_hit_track",           &num_hit_track_);
+  tree_->Branch("num_delayed_hits_vertex", &num_delayed_hits_vertex_);
+  tree_->Branch("pdg",                     &particle_pdg_);
+  tree_->Branch("length",                  &length_);
+  tree_->Branch("momentum",                &momentum_);
+  tree_->Branch("cos_theta",               &cos_theta_);
+  tree_->Branch("hit_muon_detector",       &hit_muon_detector_);
+  tree_->Branch("mucl",                    &mucl_);
+  tree_->Branch("is_contained",            &is_contained_);
+  tree_->Branch("num_delayed_hits_track",  &num_delayed_hits_track_);
+  tree_->Branch("num_hits",                &num_hits_);
 
   Clear();
 }
