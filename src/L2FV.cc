@@ -83,7 +83,7 @@ void L2FV::set_volume_constants(const std::string& geometry_dir) {
   UWG_BOX_MIN_Y = WAGASCI_UPSTREAM_POS_Y - 0.5*WGS_WATER_BOX_HEIGHT;
   UWG_BOX_MAX_Y = WAGASCI_UPSTREAM_POS_Y + 0.5*WGS_WATER_BOX_HEIGHT;
   UWG_BOX_MIN_Z = WAGASCI_UPSTREAM_POS_Z - 0.5*WGS_WATER_BOX_DEPTH;
-  DWG_BOX_MAX_Z = WAGASCI_UPSTREAM_POS_Z + 0.5*WGS_WATER_BOX_DEPTH;
+  UWG_BOX_MAX_Z = WAGASCI_UPSTREAM_POS_Z + 0.5*WGS_WATER_BOX_DEPTH;
   
   /*** WAGASCI Downstream ***/
   dim.GetPosWgs(B2View::kTopView, 0, 2, kGridLeftScintillator, pos);
