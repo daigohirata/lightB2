@@ -31,14 +31,14 @@ mkdir build && cd build
 cmake ..
 
 # Build
-make -j4
+make 
 ```
 
 ## Usage
 
 Run the main executable with B2MC ROOT input files:
 ```bash
-./lightb2 /path/to/b2mc.root -o output.root
+./lightb2 --start <file number> --end <file number> --output-dir /path/to/directory/
 ```
 
 Options:
@@ -53,6 +53,7 @@ Options:
 LightB2/
 ├── src/        # Source codes
 ├── include/    # Header files
+├── data/    # Spline files
 ├── CMakeLists.txt
 └── README.md
 ```

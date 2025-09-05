@@ -14,9 +14,9 @@ class L2MichelElectron {
 public:
   L2MichelElectron(const B2SpillSummary* spill,
                    B2Detector vertex_detector);
-  Bool_t SearchAroundVertex();
-  Bool_t SearchAroundTrackEnd(const B2TrackSummary* track);
-  Bool_t SearchAroundPoint(const TVector3& point, const double search_radius);
+  Int_t SearchAroundVertex();
+  Int_t SearchAroundTrackEnd(const B2TrackSummary* track);
+  Int_t SearchAroundPoint(const TVector3& point, const double search_radius);
 
 
 private:

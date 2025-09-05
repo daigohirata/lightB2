@@ -16,16 +16,16 @@ L2MichelElectron::L2MichelElectron(const B2SpillSummary* spill,
                                    B2Detector vertex_detector)
   : spill_(spill), vertex_detector_(vertex_detector) {};
 
-Bool_t L2MichelElectron::SearchAroundVertex() {
+Int_t L2MichelElectron::SearchAroundVertex() {
   auto vertex = (B2VertexSummary*)spill_->GetTrueVertices().At(0);
   return SearchAroundPoint(vertex->GetAbsolutePosition().GetValue(), radius_from_vertex_);
 }
 
-Bool_t L2MichelElectron::SearchAroundTrackEnd(const B2TrackSummary* track) {
+Int_t L2MichelElectron::SearchAroundTrackEnd(const B2TrackSummary* track) {
   return SearchAroundPoint(track->GetFinalPosition().GetValue(), radius_from_trackend_);
 }
 
-Bool_t L2MichelElectron::SearchAroundPoint(const TVector3& point, const double search_radius){  
+Int_t L2MichelElectron::SearchAroundPoint(const TVector3& point, const double search_radius){  
   double me_hits_counter = 0;
 
   for (auto it_hit = spill_->BeginHit(); auto hit = it_hit.Next(); ) {
@@ -37,6 +37,6 @@ Bool_t L2MichelElectron::SearchAroundPoint(const TVector3& point, const double s
       me_hits_counter++;
   }
 
-  return (me_hits_counter >= num_required_hits_);
+  return me_hits_counter;
 };
 

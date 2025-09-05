@@ -24,7 +24,7 @@ public:
   Int_t vertex_detector_;
   Int_t num_fs_pion_;
   Int_t num_hit_track_;
-  Bool_t has_vertex_me_;
+  Int_t num_delayed_hits_vertex_;
   std::vector<Int_t> particle_pdg_;
   std::vector<Double_t> length_;
   std::vector<Double_t> momentum_;
@@ -32,7 +32,7 @@ public:
   std::vector<Int_t> hit_muon_detector_;
   std::vector<Double_t> mucl_;
   std::vector<Bool_t> is_contained_;
-  std::vector<Bool_t> has_track_me_;
+  std::vector<Int_t> num_delayed_hits_track_;
   std::vector<Int_t> num_hits_;
 
   std::unique_ptr<TFile> outfile_;

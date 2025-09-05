@@ -67,7 +67,7 @@ Int_t process(const int& file_number, L2Writer& writer, const std::string& geome
     writer.incoming_neutrino_ = vertex->GetIncomingParticlePdg();
     writer.mode_ = vertex->GetInteractionType();
     writer.vertex_detector_ = (Int_t)vertex_detector;
-    writer.has_vertex_me_ = me_seacher.SearchAroundVertex();
+    writer.num_delayed_hits_vertex_ = me_seacher.SearchAroundVertex();
 
     // track loop
     for (auto it_track = spill->BeginTrueTrack(); const auto* track = it_track.Next(); ) {
@@ -101,10 +101,10 @@ Int_t process(const int& file_number, L2Writer& writer, const std::string& geome
 
       if ( writer.is_contained_.back() ) {
         writer.mucl_.emplace_back( analyzer.CalculateMucl(num_exclude_hits) );
-        writer.has_track_me_.emplace_back( me_seacher.SearchAroundTrackEnd(track) );
+        writer.num_delayed_hits_track_.emplace_back( me_seacher.SearchAroundTrackEnd(track) );
       } else {
         writer.mucl_.emplace_back( analyzer.CalculateMucl(0) );
-        writer.has_track_me_.emplace_back( false );
+        writer.num_delayed_hits_track_.emplace_back( -1 );
       }
     }
 
