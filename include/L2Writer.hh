@@ -33,6 +33,7 @@ public:
   std::vector<Double_t> mucl_;
   std::vector<Bool_t> is_contained_;
   std::vector<Bool_t> has_track_me_;
+  std::vector<Int_t> num_hits_;
 
   std::unique_ptr<TFile> outfile_;
   TTree *tree_;

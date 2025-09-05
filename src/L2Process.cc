@@ -90,6 +90,7 @@ Int_t process(const int& file_number, L2Writer& writer, const std::string& geome
       writer.momentum_.emplace_back( track->GetInitialAbsoluteMomentum().GetValue() );
       writer.cos_theta_.emplace_back( cos_theta );
       writer.hit_muon_detector_.emplace_back( analyzer.HitMuonDetector(bm_required_hit) );
+      writer.num_hits_.emplace_back( track->GetNumHits(B2View::kUnknownView, vertex_detector, 0) );
       
       auto child_muon = analyzer.SearchChildMuon(spill);
       if ( B2Pdg::IsChargedPion(track->GetParticlePdg()) && child_muon) {

@@ -36,6 +36,7 @@ L2Writer::L2Writer(const TString& filename) {
   tree_->Branch("mucl",              &mucl_);
   tree_->Branch("is_contained",      &is_contained_);
   tree_->Branch("has_track_me",      &has_track_me_);
+  tree_->Branch("num_hits",          &num_hits_);
 
   Clear();
 }
@@ -61,6 +62,7 @@ void L2Writer::Clear() {
   mucl_.clear();
   is_contained_.clear();
   has_track_me_.clear();
+  num_hits_.clear();
 }
 
 void L2Writer::Fill() {
