@@ -77,7 +77,7 @@ Int_t process(const int& file_number, L2Writer& writer, const std::string& geome
       if ( B2Pdg::IsChargedPion(track->GetParticlePdg()) ) 
         writer.num_fs_pion_++;
 
-      if ( !analyzer.HasVertexDetectorHit() ) continue;
+      writer.has_vd_hits_.emplace_back( analyzer.HasVertexDetectorHit() );
 
       const TVector3& initial_pos = track->GetInitialPosition().GetValue();
       const TVector3& final_pos = track->GetFinalPosition().GetValue();

@@ -28,6 +28,7 @@ L2Writer::L2Writer(const TString& filename) {
   tree_->Branch("num_fs_pion",             &num_fs_pion_);
   tree_->Branch("num_hit_track",           &num_hit_track_);
   tree_->Branch("num_delayed_hits_vertex", &num_delayed_hits_vertex_);
+  tree_->Branch("has_vd_hits",             &has_vd_hits_);
   tree_->Branch("pdg",                     &particle_pdg_);
   tree_->Branch("length",                  &length_);
   tree_->Branch("momentum",                &momentum_);
@@ -54,6 +55,7 @@ void L2Writer::Clear() {
   num_fs_pion_ = 0;
   num_hit_track_ = 0;
   num_delayed_hits_vertex_ = 0;
+  has_vd_hits_.clear();
   particle_pdg_.clear();
   length_.clear();
   momentum_.clear();

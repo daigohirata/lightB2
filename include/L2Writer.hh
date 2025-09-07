@@ -25,6 +25,7 @@ public:
   Int_t num_fs_pion_;
   Int_t num_hit_track_;
   Int_t num_delayed_hits_vertex_;
+  std::vector<Bool_t> has_vd_hits_;
   std::vector<Int_t> particle_pdg_;
   std::vector<Double_t> length_;
   std::vector<Double_t> momentum_;
