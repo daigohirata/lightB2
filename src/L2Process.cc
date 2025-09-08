@@ -77,14 +77,18 @@ Int_t process(const int& file_number, L2Writer& writer, const std::string& geome
       if ( B2Pdg::IsChargedPion(track->GetParticlePdg()) ) 
         writer.num_fs_pion_++;
 
-      writer.has_vd_hits_.emplace_back( analyzer.HasVertexDetectorHit() );
+      if ( analyzer.HasVertexDetectorHit() ) {
+        writer.has_vd_hits_.emplace_back( true );
+        writer.num_hit_track_++; 
+      } else {
+        writer.has_vd_hits_.emplace_back( false );
+      }
 
       const TVector3& initial_pos = track->GetInitialPosition().GetValue();
       const TVector3& final_pos = track->GetFinalPosition().GetValue();
       const TVector3& dir = track->GetInitialDirection().GetValue();
       Double_t cos_theta = dir.X()*L2Util::nu_avg_dir.X() + dir.Y()*L2Util::nu_avg_dir.Y() + dir.Z()*L2Util::nu_avg_dir.Z();
 
-      writer.num_hit_track_++;
       writer.particle_pdg_.emplace_back( (Int_t)track->GetParticlePdg() );
       writer.length_.emplace_back( (initial_pos - final_pos).Mag() );
       writer.momentum_.emplace_back( track->GetInitialAbsoluteMomentum().GetValue() );
