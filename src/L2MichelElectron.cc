@@ -9,6 +9,7 @@
 
 // B2MC include
 #include <B2SpillSummary.hh>
+#include <B2TrackSummary.hh>
 #include <B2VertexSummary.hh>
 #include <B2HitSummary.hh>
 
@@ -30,7 +31,8 @@ Int_t L2MichelElectron::SearchAroundPoint(const TVector3& point, const double se
 
   for (auto it_hit = spill_->BeginHit(); auto hit = it_hit.Next(); ) {
     if ( hit->GetDetectorId() != vertex_detector_ ||
-         hit->GetTrueTimeNs() < hit_time_threshold ) continue;
+         hit->GetTrueTimeNs() < hit_time_threshold ||
+         hit->GetParentTrack().GetTrackType() == B2TrackType::kPrimaryTrack ) continue;
     
     double dist = (hit->GetTrueAbsolutePosition().GetValue() - point).Mag();
     if (dist < radius_from_vertex_) 
