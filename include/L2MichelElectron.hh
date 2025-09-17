@@ -24,7 +24,8 @@ private:
   B2Detector vertex_detector_;
   const double radius_from_vertex_ = 30.0 * cm;
   const double radius_from_trackend_ = 15.0 * cm;
-  const double hit_time_threshold = 120.0; //[ns]
+  const double hit_time_threshold_start = 120.0; //[ns]
+  const double hit_time_threshold_end   = 580.0; //[ns]
   const int num_required_hits_ = 3;
 };
 
